@@ -1,7 +1,7 @@
 // Copyright 2018 harlyq
 // License MIT
 
-(function() {
+(function () {
 
   const TIME_PARAM = 0 // [0].x
   const ID_PARAM = 1 // [0].y
@@ -11,7 +11,7 @@
   const SPAWN_RATE_PARAM = 5 // [1].y
   const SEED_PARAM = 6 // [1].z
   const VERTEX_COUNT_PARAM = 7 // [1].w
-  const PARTICLE_SIZE_PARAM =  8 // [2].x
+  const PARTICLE_SIZE_PARAM = 8 // [2].x
   const USE_PERSPECTIVE_PARAM = 9 // [2].y
   const DIRECTION_PARAM = 10 // [2].z
   const DRAG_PARAM = 11 // [2].w
@@ -71,22 +71,22 @@
     }))
     if (parts.length === 1) parts[1] = parts[0] // if there is no second part then copy the first part
     parts.length = 2
-    return flattenDeep( parts.map(a => def.map((x,i) => typeof a[i] === "undefined" ? x : a[i])) )
+    return flattenDeep(parts.map(a => def.map((x, i) => typeof a[i] === "undefined" ? x : a[i])))
   }
 
   // parse a ("," separated) list of vector range elements
   const parseVecRangeArray = (str, def) => {
-    return flattenDeep( str.split(",").map(a => parseVecRange(a, def)) )
+    return flattenDeep(str.split(",").map(a => parseVecRange(a, def)))
   }
 
   // parse a ("," separated) list of color range elements
   const parseColorRangeArray = (str) => {
-    return flattenDeep( str.split(",").map(a => { 
+    return flattenDeep(str.split(",").map(a => {
       let parts = a.split("..")
       if (parts.length === 1) parts[1] = parts[0] // if there is no second part then copy the first part
       parts.length = 2
-      return parts.map(b => new THREE.Color(b.trim())) 
-    }) )
+      return parts.map(b => new THREE.Color(b.trim()))
+    }))
   }
 
   const toLowerCase = x => x.toLowerCase()
@@ -105,7 +105,7 @@
 
   // console.assert(AFRAME.utils.deepEqual(parseColorRangeArray("black..red,blue,,#ff0..#00ffaa").map(a => a.getHexString()), ["000000","ff0000","0000ff","0000ff","ffffff","ffffff","ffff00","00ffaa"]))
 
-  let WHITE_TEXTURE = new THREE.DataTexture(new Uint8Array(3).fill(255), 1, 1, THREE.RGBFormat)
+  let WHITE_TEXTURE = new THREE.DataTexture(new Uint8Array(4).fill(255), 1, 1, THREE.RGBAFormat)
   WHITE_TEXTURE.needsUpdate = true
 
   const BLENDING_MAP = {
@@ -131,7 +131,7 @@
       spawnType: { default: "continuous", oneOf: ["continuous", "burst"], parse: toLowerCase },
       spawnRate: { default: 10 },
       source: { type: "selector" },
-      textureFrame: { type: "vec2", default: {x: 1, y: 1} },
+      textureFrame: { type: "vec2", default: { x: 1, y: 1 } },
       textureCount: { type: "int", default: 0 },
       textureLoop: { default: 1 },
       randomizeFrames: { default: false },
@@ -160,7 +160,7 @@
       rotation: { default: "0" }, // if rotating textureFrames important to have enough space so overlapping parts of frames are blank (circle of sqrt(2) around the center of the frame will be viewable while rotating)
       opacity: { default: "1" },
       velocityScale: { default: 0 },
-      velocityScaleMinMax: { type: "vec2", default: {x: 0, y: 3} },
+      velocityScaleMinMax: { type: "vec2", default: { x: 0, y: 3 } },
       drag: { default: 0 },
       destination: { type: "selector" },
       destinationOffset: { default: "0 0 0" },
@@ -200,23 +200,23 @@
       this.overTimeArrayLength = 0
       this.emitterTime = 0
       this.delayTime = 0
-      this.lifeTime = [1,1]
-      this.trailLifeTime = [0,0] // if 0, then use this.lifeTime
+      this.lifeTime = [1, 1]
+      this.trailLifeTime = [0, 0] // if 0, then use this.lifeTime
 
       // this.useTransparent = false
       this.textureFrames = new Float32Array(4) // xy is TextureFrame, z is TextureCount, w is TextureLoop
-      this.offset = new Float32Array(2*4).fill(0) // xyz is position, w is radialPosition
-      this.velocity = new Float32Array(2*4).fill(0) // xyz is velocity, w is radialVelocity
-      this.acceleration = new Float32Array(2*4).fill(0) // xyz is acceleration, w is radialAcceleration
-      this.angularVelocity = new Float32Array(2*4).fill(0) // xyz is angularVelocity, w is lifeTime
-      this.angularAcceleration = new Float32Array(2*4).fill(0) // xyz is angularAcceleration
-      this.orbital = new Float32Array(2*2).fill(0) // x is orbitalVelocity, y is orbitalAcceleration
+      this.offset = new Float32Array(2 * 4).fill(0) // xyz is position, w is radialPosition
+      this.velocity = new Float32Array(2 * 4).fill(0) // xyz is velocity, w is radialVelocity
+      this.acceleration = new Float32Array(2 * 4).fill(0) // xyz is acceleration, w is radialAcceleration
+      this.angularVelocity = new Float32Array(2 * 4).fill(0) // xyz is angularVelocity, w is lifeTime
+      this.angularAcceleration = new Float32Array(2 * 4).fill(0) // xyz is angularAcceleration
+      this.orbital = new Float32Array(2 * 2).fill(0) // x is orbitalVelocity, y is orbitalAcceleration
       this.colorOverTime // color is xyz and opacity is w. created in update()
       this.rotationScaleOverTime // x is rotation, y is scale. created in update()
-      this.params = new Float32Array(5*4).fill(0) // see ..._PARAM constants
+      this.params = new Float32Array(5 * 4).fill(0) // see ..._PARAM constants
       this.velocityScale = new Float32Array(3).fill(0) // x is velocityScale, y is velocityScaleMinMax.x and z is velocityScaleMinMax.y
       this.emitterColor = new THREE.Vector3() // use vec3 for color
-      this.destination = new Float32Array(2*4).fill(0) // range value, xyz is destinationEntity.position + destinationOffset, w is destinationWeight
+      this.destination = new Float32Array(2 * 4).fill(0) // range value, xyz is destinationEntity.position + destinationOffset, w is destinationWeight
       this.destinationOffset // parsed value for destinationOffset, this will be blended into destination
       this.destinationWeight // parsed value for destinationWeight
       this.nextID = 0
@@ -240,15 +240,15 @@
 
     update(oldData) {
       const data = this.data
-      
+
       let boundsDirty = data.particleSize !== oldData.particleSize
       let overTimeDirty = false
 
       // can only change overTimeSlots while paused, as it will rebuild the shader (see updateDefines())
       if (data.overTimeSlots !== oldData.overTimeSlots && !this.isPlaying) {
-        this.overTimeArrayLength = this.data.overTimeSlots*2 + 1 // each slot represents 2 glsl array elements pluse one element for the length info
-        this.colorOverTime = new Float32Array(4*this.overTimeArrayLength).fill(0) // color is xyz and opacity is w
-        this.rotationScaleOverTime = new Float32Array(2*this.overTimeArrayLength).fill(0) // x is rotation, y is scale
+        this.overTimeArrayLength = this.data.overTimeSlots * 2 + 1 // each slot represents 2 glsl array elements pluse one element for the length info
+        this.colorOverTime = new Float32Array(4 * this.overTimeArrayLength).fill(0) // color is xyz and opacity is w
+        this.rotationScaleOverTime = new Float32Array(2 * this.overTimeArrayLength).fill(0) // x is rotation, y is scale
         overTimeDirty = true
       }
 
@@ -256,7 +256,7 @@
       this.params[USE_PERSPECTIVE_PARAM] = data.usePerspective ? 1 : 0
       this.params[DIRECTION_PARAM] = data.direction === "forward" ? 0 : 1
       this.params[DRAG_PARAM] = THREE.Math.clamp(data.drag, 0, 1)
-      this.params[SCREEN_DEPTH_OFFSET_PARAM] = data.screenDepthOffset*1e-5
+      this.params[SCREEN_DEPTH_OFFSET_PARAM] = data.screenDepthOffset * 1e-5
       this.params[RIBBON_WIDTH_PARAM] = data.ribbonWidth
       this.params[RIBBON_UV_MULTIPLIER_PARAM] = data.ribbonUVMultiplier
 
@@ -337,7 +337,7 @@
 
       if (data.trailLifeTime !== oldData.trailLifeTime) {
         // if trailLifeTime is 0 then use the lifeTime values, and always ensure that trailLifeTime never exceeds the lifeTime
-        this.trailLifeTime = parseVecRange(data.trailLifeTime, [0]).map((x,i) => x > 0 ? x : this.lifeTime[i])
+        this.trailLifeTime = parseVecRange(data.trailLifeTime, [0]).map((x, i) => x > 0 ? x : this.lifeTime[i])
         this["angularAcceleration"][3] = this.trailLifeTime[0] // angularAcceleration[0].w
         this["angularAcceleration"][7] = this.trailLifeTime[1] // angularAcceleration[1].w
       }
@@ -373,10 +373,10 @@
         const maxParticleLifeTime = this.lifeTime[1]
         const maxTrailLifeTime = data.trailInterval > 0 ? this.trailLifeTime[1] : 0
         const maxAge = maxParticleLifeTime + maxTrailLifeTime
-        const particleCount = Math.max( 1, Math.ceil(maxAge*data.spawnRate) )
-        this.trailCount = 1 + ( data.trailInterval > 0 ? Math.ceil( Math.min(maxTrailLifeTime, maxParticleLifeTime)/data.trailInterval ) : 0 ) // +1 because the trail includes the lead particle
+        const particleCount = Math.max(1, Math.ceil(maxAge * data.spawnRate))
+        this.trailCount = 1 + (data.trailInterval > 0 ? Math.ceil(Math.min(maxTrailLifeTime, maxParticleLifeTime) / data.trailInterval) : 0) // +1 because the trail includes the lead particle
 
-        if (this.isRibbon()) { 
+        if (this.isRibbon()) {
           this.trailCount++ // short ribbons will need an extra vert so they can bend around an interval, but why the extra vert for long ribbons?
           this.count = particleCount * this.trailCount * VERTS_PER_RIBBON
         } else {
@@ -444,7 +444,7 @@
       if (this.startDisabled) { return }
 
       if (deltaTime > 100) deltaTime = 100 // ignore long pauses
-      const dt = deltaTime/1000 // dt is in seconds
+      const dt = deltaTime / 1000 // dt is in seconds
 
       if (data.enable) { this.delayTime -= dt }
       if (this.delayTime >= 0) { return }
@@ -452,7 +452,7 @@
       if (!data.model || this.modelVertices) {
         this.emitterTime += dt
         this.params[TIME_PARAM] = this.emitterTime
-  
+
         if (this.geometry && this.manageIDs) {
           this.updateWorldTransform(this.emitterTime)
         } else {
@@ -499,11 +499,11 @@
     loadTexture(filename) {
       if (filename) {
         let materialSystem = this.el.sceneEl.systems["material"]
-        materialSystem.loadTexture(filename, {src: filename}, (texture) => {
+        materialSystem.loadTexture(filename, { src: filename }, (texture) => {
           if (this.isRibbon()) {
             texture.wrapS = THREE.RepeatWrapping // needed by ribbonUVMultipler
           }
-          this.material.uniforms.map.value = texture          
+          this.material.uniforms.map.value = texture
         })
       } else {
         this.material.uniforms.map.value = WHITE_TEXTURE
@@ -542,7 +542,7 @@
           fogDensity: { value: 0.00025 },
           fogNear: { value: 1 },
           fogFar: { value: 2000 },
-          fogColor: { value: new THREE.Color( 0xffffff ) }
+          fogColor: { value: new THREE.Color(0xffffff) }
         },
 
         fragmentShader: particleFragmentShader,
@@ -563,7 +563,7 @@
         // // this.material.side = THREE.DoubleSide
         // this.material.side = THREE.FrontSide
         this.mesh = new THREE.Mesh(this.geometry, [this.material]) // geometry groups need an array of materials
-        this.mesh.drawMode = THREE.TriangleStripDrawMode
+        //this.mesh.drawMode = THREE.TriangleStripDrawMode
       } else {
         this.mesh = new THREE.Points(this.geometry, this.material)
       }
@@ -579,29 +579,29 @@
       let opacity = parseVecRangeArray(this.data.opacity, [1])
 
       const maxSlots = this.data.overTimeSlots
-      if (color.length > maxSlots*2) color.length = maxSlots*2
-      if (opacity.length > maxSlots*2) opacity.length = maxSlots*2
+      if (color.length > maxSlots * 2) color.length = maxSlots * 2
+      if (opacity.length > maxSlots * 2) opacity.length = maxSlots * 2
 
       this.colorOverTime.fill(0)
 
       // first colorOverTime block contains length information
       // divide by 2 because each array contains min and max values
-      this.colorOverTime[0] = color.length/2  // glsl colorOverTime[0].x
-      this.colorOverTime[1] = opacity.length/2 // glsl colorOverTime[0].y
+      this.colorOverTime[0] = color.length / 2  // glsl colorOverTime[0].x
+      this.colorOverTime[1] = opacity.length / 2 // glsl colorOverTime[0].y
 
       // set k to 4 because the first vec4 of colorOverTime is use for the length params
       let n = color.length
       for (let i = 0, k = 4; i < n; i++, k += 4) {
         let col = color[i]
         this.colorOverTime[k] = col.r // glsl colorOverTime[1..].x
-        this.colorOverTime[k+1] = col.g // glsl colorOverTime[1..].y
-        this.colorOverTime[k+2] = col.b // glsl colorOverTime[1..].z
+        this.colorOverTime[k + 1] = col.g // glsl colorOverTime[1..].y
+        this.colorOverTime[k + 2] = col.b // glsl colorOverTime[1..].z
       }
 
       n = opacity.length
       for (let i = 0, k = 4; i < n; i++, k += 4) {
         let alpha = opacity[i]
-        this.colorOverTime[k+3] = alpha // glsl colorOverTime[1..].w
+        this.colorOverTime[k + 3] = alpha // glsl colorOverTime[1..].w
         // this.useTransparent = this.useTransparent || alpha < 1
       }
     },
@@ -612,30 +612,30 @@
       let scale = parseVecRangeArray(this.data.scale, [1])
 
 
-      if (rotation.length > maxSlots*2) rotation.length = maxSlots*2 // 2 rotations per range
-      if (scale.length > maxSlots*2) scale.length = maxSlots*2 // 2 scales per range
+      if (rotation.length > maxSlots * 2) rotation.length = maxSlots * 2 // 2 rotations per range
+      if (scale.length > maxSlots * 2) scale.length = maxSlots * 2 // 2 scales per range
 
       // first vec4 contains the lengths of the rotation and scale vectors
       this.rotationScaleOverTime.fill(0)
-      this.rotationScaleOverTime[0] = rotation.length/2
-      this.rotationScaleOverTime[1] = scale.length/2
+      this.rotationScaleOverTime[0] = rotation.length / 2
+      this.rotationScaleOverTime[1] = scale.length / 2
 
       // set k to 2 because the first vec2 of rotationScaleOverTime is use for the length params
       // update i by 1 becase rotation is 1 numbers per vector, and k by 2 because rotationScaleOverTime is 2 numbers per vector
       let n = rotation.length
-      for (let i = 0, k = 2; i < n; i ++, k += 2) {
+      for (let i = 0, k = 2; i < n; i++, k += 2) {
         this.rotationScaleOverTime[k] = degToRad(rotation[i]) // glsl rotationScaleOverTime[1..].x
       }
 
       n = scale.length
       for (let i = 0, k = 2; i < n; i++, k += 2) {
-        this.rotationScaleOverTime[k+1] = scale[i] // glsl rotationScaleOverTime[1..].y
+        this.rotationScaleOverTime[k + 1] = scale[i] // glsl rotationScaleOverTime[1..].y
       }
     },
 
     updateVec4XYZRange(vecData, uniformAttr) {
-      const vecRange = parseVecRange(vecData, [0,0,0])
-      for (let i = 0, j = 0; i < vecRange.length; ) {
+      const vecRange = parseVecRange(vecData, [0, 0, 0])
+      for (let i = 0, j = 0; i < vecRange.length;) {
         this[uniformAttr][j++] = vecRange[i++] // x
         this[uniformAttr][j++] = vecRange[i++] // y
         this[uniformAttr][j++] = vecRange[i++] // z
@@ -645,8 +645,8 @@
     },
 
     updateAngularVec4XYZRange(vecData, uniformAttr) {
-      const vecRange = parseVecRange(vecData, [0,0,0])
-      for (let i = 0, j = 0; i < vecRange.length; ) {
+      const vecRange = parseVecRange(vecData, [0, 0, 0])
+      for (let i = 0, j = 0; i < vecRange.length;) {
         this[uniformAttr][j++] = degToRad(vecRange[i++]) // x
         this[uniformAttr][j++] = degToRad(vecRange[i++]) // y
         this[uniformAttr][j++] = degToRad(vecRange[i++]) // z
@@ -676,28 +676,28 @@
       let extent = [new Array(STRIDE), new Array(STRIDE)] // extent[0] = min values, extent[1] = max values
 
       if (data.drag > 0) {
-        maxAge = maxAge*(1 - .5*data.drag)
+        maxAge = maxAge * (1 - .5 * data.drag)
       }
 
       // Use offset, velocity and acceleration to determine the extents for the particles
       for (let j = 0; j < 2; j++) { // index for extent
-        const compare = j === 0 ? Math.min: Math.max
+        const compare = j === 0 ? Math.min : Math.max
 
         for (let i = 0; i < STRIDE; i++) { // 0 = x, 1 = y, 2 = z, 3 = radial
           const offset = compare(this.offset[i], this.offset[i + STRIDE])
           const velocity = compare(this.velocity[i], this.velocity[i + STRIDE])
           const acceleration = compare(this.acceleration[i], this.acceleration[i + STRIDE])
-  
+
           // extent at time tmax
           extent[j][i] = offset + (velocity + 0.5 * acceleration * maxAge) * maxAge
-  
+
           // extent at time t0
           extent[j][i] = compare(extent[j][i], offset)
-  
+
           // extent at turning point
-          const turningPoint = -velocity/acceleration
+          const turningPoint = -velocity / acceleration
           if (turningPoint > 0 && turningPoint < maxAge) {
-            extent[j][i] = compare(extent[j][i], offset - 0.5*velocity*velocity/acceleration)
+            extent[j][i] = compare(extent[j][i], offset - 0.5 * velocity * velocity / acceleration)
           }
         }
       }
@@ -710,12 +710,12 @@
         extent[1][0] += this.modelBounds.max.x
         extent[1][1] += this.modelBounds.max.y
         extent[1][2] += this.modelBounds.max.z
-     }
+      }
 
       // apply the radial extents to the XYZ extents
       const domAttrs = this.el.getDOMAttribute(this.attrName)
       const maxScale = this.rotationScaleOverTime.reduce((max, x, i) => (i & 1) ? Math.max(max, x) : max, 0) // scale is every second number
-      const maxRadial = Math.max(Math.abs(extent[0][3]), Math.abs(extent[1][3])) + data.particleSize*0.00045*maxScale
+      const maxRadial = Math.max(Math.abs(extent[0][3]), Math.abs(extent[1][3])) + data.particleSize * 0.00045 * maxScale
       const isSphere = data.radialType === "sphere" || domAttrs.angularVelocity || domAttrs.angularAcceleration || domAttrs.orbitalVelocity || domAttrs.orbitalAcceleration
 
       extent[0][0] -= maxRadial
@@ -751,7 +751,7 @@
       }
     },
 
-    updateDestinationEntity: (function() {
+    updateDestinationEntity: (function () {
       let dest = new THREE.Vector3()
       let selfPos = new THREE.Vector3()
 
@@ -796,7 +796,7 @@
           vertexIDs.fill(-1)
 
           this.numEnabled = 0
-          this.numDisabled = n  
+          this.numDisabled = n
         } else {
           for (let i = 0; i < n; i++) {
             vertexIDs[i] = i
@@ -806,11 +806,11 @@
           this.numDisabled = 0
         }
 
-        this.geometry.addAttribute("vertexID", new THREE.Float32BufferAttribute(vertexIDs, 1)) // gl_VertexID is not supported, so make our own id
-        this.geometry.addAttribute("position", new THREE.Float32BufferAttribute(new Float32Array(n*3).fill(0), 3))
+        this.geometry.setAttribute("vertexID", new THREE.Float32BufferAttribute(vertexIDs, 1)) // gl_VertexID is not supported, so make our own id
+        this.geometry.setAttribute("position", new THREE.Float32BufferAttribute(new Float32Array(n * 3).fill(0), 3))
 
         if (this.data.source) {
-          this.geometry.addAttribute("quaternion", new THREE.Float32BufferAttribute(new Float32Array(n*4).fill(0), 4))
+          this.geometry.setAttribute("quaternion", new THREE.Float32BufferAttribute(new Float32Array(n * 4).fill(0), 4))
         }
 
         // the ribbons are presented as triangle strips, so each vert pairs with it's two previous verts to
@@ -949,14 +949,14 @@
       }
     },
 
-    updateWorldTransform: (function() {
+    updateWorldTransform: (function () {
       let position = new THREE.Vector3()
       let quaternion = new THREE.Quaternion()
       let scale = new THREE.Vector3()
       let modelPosition = new THREE.Vector3()
       let m4 = new THREE.Matrix4()
 
-      return function(emitterTime) {
+      return function (emitterTime) {
         const data = this.data
         const n = this.count
 
@@ -965,7 +965,7 @@
         // the ID of last emitted particle (this.params[ID_PARAM])
         const spawnRate = this.data.spawnRate
         const isBurst = data.spawnType === "burst"
-        const spawnDelta = isBurst ? 0 : 1/spawnRate // for burst particles spawn everything at once
+        const spawnDelta = isBurst ? 0 : 1 / spawnRate // for burst particles spawn everything at once
         const isEnableDisable = data.enable ? this.numEnabled < n : this.numDisabled < n
         const hasSource = data.source && data.source.object3D != null
         const isUsingModel = this.modelVertices && this.modelVertices.length
@@ -981,7 +981,7 @@
           data.source.object3D.updateMatrixWorld()
 
           // get source matrix in our local space
-          m4.getInverse(this.el.object3D.matrixWorld)
+          m4.copy(this.el.object3D.matrixWorld).invert();
           m4.multiply(data.source.object3D.matrixWorld)
           m4.decompose(position, quaternion, scale)
           this.geometry.boundingSphere.center.copy(position)
@@ -1010,28 +1010,28 @@
 
           // for each particle, update all of its trails. if there are no trails, then
           // trailcount is 1
-          for (let particleVert = 0, particleVertCount = isRibbon ? VERTS_PER_RIBBON : 1; particleVert < particleVertCount; particleVert++ ) {
+          for (let particleVert = 0, particleVertCount = isRibbon ? VERTS_PER_RIBBON : 1; particleVert < particleVertCount; particleVert++) {
             for (let trail = 0; trail < this.trailCount; trail++) {
               id = this.nextID
 
               if (isUsingModel) {
                 particlePosition.setXYZ(index, modelPosition.x, modelPosition.y, modelPosition.z)
               }
-    
+
               if (hasSource) {
                 particlePosition.setXYZ(index, position.x, position.y, position.z)
                 particleQuaternion.setXYZW(index, quaternion.x, quaternion.y, quaternion.z, quaternion.w)
               }
-    
+
               particleVertexID.setX(index, data.enable ? id : -1) // id is unique and is tied to position and quaternion
-    
+
               if (isEnableDisable) {
                 // if we're enabled then increase the number of enabled and reset the number disabled, once we 
                 // reach this.numEnabled === n, all IDs would have been set and isEnableDisable will switch to false.
                 // vice versa if we are disabled. these numbers represent the number of consecutive enables or disables.
                 this.numEnabled = data.enable ? this.numEnabled + 1 : 0
                 this.numDisabled = data.enable ? 0 : this.numDisabled + 1
-              }  
+              }
 
               index = (index + 1) % n
               numSpawned++
@@ -1049,11 +1049,11 @@
 
         if (numSpawned > 0) {
           const trailVertCount = this.trailCount * (isRibbon ? VERTS_PER_RIBBON : 1)
-          this.params[ID_PARAM] = Math.floor(id/trailVertCount) // particle ID
+          this.params[ID_PARAM] = Math.floor(id / trailVertCount) // particle ID
 
           if (isBurst) { // if we did burst emit, then wait for maxAge before emitting again
             this.nextTime += this.lifeTime[1]
-            if (data.trailInterval > 0) { 
+            if (data.trailInterval > 0) {
               this.nextTime += this.trailLifeTime[1]
             }
           }
@@ -1077,9 +1077,9 @@
           }
 
           // if (changeIDs) {
-            particleVertexID.updateRange.offset = startIndex
-            particleVertexID.updateRange.count = numSpawned
-            particleVertexID.needsUpdate = true
+          particleVertexID.updateRange.offset = startIndex
+          particleVertexID.updateRange.count = numSpawned
+          particleVertexID.needsUpdate = true
           // }
 
           // this will cause a glitch in the appearance as we reset the IDs to prevent them from overflowing
@@ -1091,22 +1091,22 @@
 
   const applyScale = (vertices, scale) => {
     if (scale.x !== 1 && scale.y !== 1 && scale.z !== 1) {
-      for (let i = 0, n = vertices.length; i < n; i+=3) {
+      for (let i = 0, n = vertices.length; i < n; i += 3) {
         vertices[i] *= scale.x
-        vertices[i+1] *= scale.y
-        vertices[i+2] *= scale.z
+        vertices[i + 1] *= scale.y
+        vertices[i + 2] *= scale.z
       }
     }
   }
 
-  const randomPointInTriangle = (function() {
+  const randomPointInTriangle = (function () {
     let v1 = new THREE.Vector3()
     let v2 = new THREE.Vector3()
 
     // see http://mathworld.wolfram.com/TrianglePointPicking.html
     return function randomPointInTriangle(vertices, pos) {
       // assume each set of 3 vertices (each vertex has 3 floats) is a triangle
-      let triangleOffset = Math.floor(Math.random()*vertices.length/9)*9
+      let triangleOffset = Math.floor(Math.random() * vertices.length / 9) * 9
       v1.fromArray(vertices, triangleOffset)
       v2.fromArray(vertices, triangleOffset + 3)
       pos.fromArray(vertices, triangleOffset + 6)
@@ -1119,33 +1119,33 @@
 
       v2.sub(v1).multiplyScalar(r1)
       pos.sub(v1).multiplyScalar(r2).add(v2).add(v1)
-    }  
+    }
   })()
 
-  const randomPointOnTriangleEdge = (function() {
+  const randomPointOnTriangleEdge = (function () {
     let v1 = new THREE.Vector3()
     let v2 = new THREE.Vector3()
     let v3 = new THREE.Vector3()
 
     return function randomPointOnTriangleEdge(vertices, pos) {
       // assume each set of 3 vertices (each vertex has 3 floats) is a triangle
-      let triangleOffset = Math.floor(Math.random()*vertices.length/9)*9
+      let triangleOffset = Math.floor(Math.random() * vertices.length / 9) * 9
       v1.fromArray(vertices, triangleOffset)
       v2.fromArray(vertices, triangleOffset + 3)
       v3.fromArray(vertices, triangleOffset + 6)
       r1 = Math.random()
-      if (r1 > 2/3) {
-        pos.copy(v1).sub(v3).multiplyScalar(r1*3 - 2).add(v3)
-      } else if (r1 > 1/3) {
-        pos.copy(v3).sub(v2).multiplyScalar(r1*3 - 1).add(v2)
+      if (r1 > 2 / 3) {
+        pos.copy(v1).sub(v3).multiplyScalar(r1 * 3 - 2).add(v3)
+      } else if (r1 > 1 / 3) {
+        pos.copy(v3).sub(v2).multiplyScalar(r1 * 3 - 1).add(v2)
       } else {
-        pos.copy(v2).sub(v1).multiplyScalar(r1*3).add(v1)
+        pos.copy(v2).sub(v1).multiplyScalar(r1 * 3).add(v1)
       }
-    }  
+    }
   })()
 
   function randomVertex(vertices, pos) {
-    let index = Math.floor(Math.random()*vertices.length/3)*3
+    let index = Math.floor(Math.random() * vertices.length / 3) * 3
     pos.fromArray(vertices, index)
   }
 
@@ -1847,10 +1847,13 @@ void main() {
 #endif
 
   vec4 mapTexel = texture2D( map, uv );
-  diffuseColor *= mapTexelToLinear( mapTexel );
+  // diffuseColor *= mapTexelToLinear( mapTexel );
+  diffuseColor *= mapTexel;
 #endif // USE_MAP
 
-  #include <alphatest_fragment>
+#ifdef USE_ALPHATEST
+if ( diffuseColor.a < 0.1 ) discard;
+#endif
 
   diffuseColor *= vParticleColor;
   outgoingLight = diffuseColor.rgb;
